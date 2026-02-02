@@ -1,0 +1,29 @@
+<?php
+
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\UserController;
+use Illuminate\Support\Facades\Route;
+
+Route::controller(AuthController::class)->group(function () {
+    Route::post("auth/login", "login");
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::prefix("/auth")->name("auth.")->group(function () {
+            Route::get('data', "data")->name("data");
+            Route::delete('logout', "logout")->name("logout");
+        });
+        // Route pour changer le mot de passe (accessible même si password_change_required est true)
+        Route::put('users/update-password', [UserController::class, 'updatePassword'])->name('user.update-password');
+        // Routes protégées par le middleware de statut de compte
+        Route::middleware('account.status')->group(function () {
+            // Routes utilisateurs
+            Route::prefix('users')->name('user.')->controller(UserController::class)->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::get('/{id}', 'show')->name('show');
+                Route::put('/{id}', 'update')->name('update');
+                Route::delete('/{id}', 'destroy')->name('destroy');
+            });
+            // Routes supplémentaires sous autorisation
+        });
+    });
+});
