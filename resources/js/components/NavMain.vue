@@ -14,10 +14,11 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { urlIsActive } from '@/lib/utils';
+import { toUrl, urlIsActive } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronRight } from 'lucide-vue-next';
+import type { InertiaLinkProps } from '@inertiajs/vue3';
 
 defineProps<{
     items: NavItem[];
@@ -35,9 +36,9 @@ const isItemActive = (item: NavItem): boolean => {
     return false;
 };
 
-const isSubItemActive = (href?: string): boolean => {
+const isSubItemActive = (href?: NonNullable<InertiaLinkProps['href']>): boolean => {
     if (!href) return false;
-    return urlIsActive(href, page.url);
+    return urlIsActive(toUrl(href), page.url);
 };
 </script>
 
@@ -45,7 +46,10 @@ const isSubItemActive = (href?: string): boolean => {
     <SidebarGroup class="px-2 py-0">
         <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
-            <SidebarMenuItem v-for="item in items" :key="item.title">
+            <template v-for="item in items" :key="item.title">
+                <!-- Séparateur avant l'item -->
+                <div v-if="item.separator" class="my-4 border-t border-sidebar-border"></div>
+                <SidebarMenuItem>
                 <!-- Menu avec sous-menus -->
                 <Collapsible v-if="item.items && item.items.length > 0" :default-open="isItemActive(item)">
                     <template #default="{ open }">
@@ -62,8 +66,51 @@ const isSubItemActive = (href?: string): boolean => {
                         <CollapsibleContent>
                             <SidebarMenuSub>
                                 <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
+                                    <!-- Sous-item avec ses propres sous-items (niveau 3) -->
+                                    <Collapsible v-if="subItem.items && subItem.items.length > 0" :default-open="isItemActive(subItem)">
+                                        <template #default="{ open: subOpen }">
+                                            <CollapsibleTrigger as-child>
+                                                <SidebarMenuSubButton
+                                                    :is-active="isItemActive(subItem)"
+                                                >
+                                                    <span>{{ subItem.title }}</span>
+                                                    <ChevronRight class="ml-auto size-4 transition-transform duration-200" :class="{ 'rotate-90': subOpen }" />
+                                                </SidebarMenuSubButton>
+                                            </CollapsibleTrigger>
+                                            <CollapsibleContent>
+                                                <SidebarMenuSub>
+                                                    <SidebarMenuSubItem v-for="subSubItem in subItem.items" :key="subSubItem.title">
+                                                        <SidebarMenuSubButton
+                                                            v-if="subSubItem.href"
+                                                            as-child
+                                                            :is-active="isSubItemActive(subSubItem.href)"
+                                                        >
+                                                            <Link :href="subSubItem.href">
+                                                                <span>{{ subSubItem.title }}</span>
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                        <SidebarMenuSubButton
+                                                            v-else-if="subSubItem.onClick"
+                                                            :is-active="false"
+                                                            @click="subSubItem.onClick"
+                                                        >
+                                                            <span>{{ subSubItem.title }}</span>
+                                                        </SidebarMenuSubButton>
+                                                        <SidebarMenuSubButton
+                                                            v-else
+                                                            :is-active="false"
+                                                            disabled
+                                                        >
+                                                            <span>{{ subSubItem.title }}</span>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                </SidebarMenuSub>
+                                            </CollapsibleContent>
+                                        </template>
+                                    </Collapsible>
+                                    <!-- Sous-item simple avec href -->
                                     <SidebarMenuSubButton
-                                        v-if="subItem.href"
+                                        v-else-if="subItem.href"
                                         as-child
                                         :is-active="isSubItemActive(subItem.href)"
                                     >
@@ -71,6 +118,7 @@ const isSubItemActive = (href?: string): boolean => {
                                             <span>{{ subItem.title }}</span>
                                         </Link>
                                     </SidebarMenuSubButton>
+                                    <!-- Sous-item avec onClick -->
                                     <SidebarMenuSubButton
                                         v-else-if="subItem.onClick"
                                         :is-active="false"
@@ -78,6 +126,7 @@ const isSubItemActive = (href?: string): boolean => {
                                     >
                                         <span>{{ subItem.title }}</span>
                                     </SidebarMenuSubButton>
+                                    <!-- Sous-item désactivé -->
                                     <SidebarMenuSubButton
                                         v-else
                                         :is-active="false"
@@ -103,6 +152,7 @@ const isSubItemActive = (href?: string): boolean => {
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
+            </template>
         </SidebarMenu>
     </SidebarGroup>
 </template>

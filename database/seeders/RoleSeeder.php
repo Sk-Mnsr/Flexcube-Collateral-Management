@@ -15,15 +15,15 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'nom' => 'IT (Admin)',
+                'nom' => 'SuperAdmin',
                 'slug' => 'it',
-                'description' => 'IT - Administrateur avec tous les droits sur l\'application',
+                'description' => 'SuperAdmin (IT) - Administrateur avec tous les droits sur l\'application, y compris la configuration',
                 'actif' => true,
             ],
             [
-                'nom' => 'Analyste Risque',
-                'slug' => 'analyste-risque',
-                'description' => 'Analyste Risque - Accès en lecture et édition pour l\'analyse des risques',
+                'nom' => 'Admin',
+                'slug' => 'admin',
+                'description' => 'Admin (Admin crédit) - Administrateur avec tous les droits sauf la configuration',
                 'actif' => true,
             ],
             [

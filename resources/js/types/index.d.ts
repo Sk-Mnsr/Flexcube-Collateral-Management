@@ -17,6 +17,7 @@ export interface NavItem {
     isActive?: boolean;
     items?: NavItem[];
     onClick?: () => void;
+    separator?: boolean;
 }
 
 export type AppPageProps<

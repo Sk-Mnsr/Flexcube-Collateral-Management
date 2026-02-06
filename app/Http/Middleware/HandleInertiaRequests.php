@@ -56,9 +56,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'profil' => $profil,
                 'roles' => $roles,
+                'isSuperAdmin' => $user ? $user->isSuperAdmin() : false,
                 'isAdmin' => $user ? $user->isAdmin() : false,
-                'isIt' => $user ? $user->isIt() : false,
-                'isAnalysteRisque' => $user ? $user->isAnalysteRisque() : false,
+                'isIt' => $user ? $user->isIt() : false, // Alias pour compatibilité
                 'isChargeAffaires' => $user ? $user->isChargeAffaires() : false,
                 'isJuridique' => $user ? $user->isJuridique() : false,
             ],

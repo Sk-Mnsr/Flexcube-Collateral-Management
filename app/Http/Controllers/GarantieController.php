@@ -28,10 +28,10 @@ class GarantieController extends Controller
 
         $query = Garantie::with(['typeGarantie', 'garant']);
 
-        // Admin voit toutes les garanties
-        if (!$user || !$user->isAdmin()) {
-            // Pour les autres rôles, on peut ajouter des restrictions si nécessaire
-            // Pour l'instant, on laisse tout visible si authentifié
+        // SuperAdmin et Admin voient toutes les garanties
+        // Juridique et Chargé d'Affaires peuvent aussi voir les garanties (lecture seule)
+        if (!$user || (!$user->isAdmin() && !$user->isSuperAdmin())) {
+            // Pour les autres rôles (Juridique, Chargé d'Affaires), on laisse tout visible si authentifié
         }
 
         // Filtre par statut
@@ -484,15 +484,15 @@ class GarantieController extends Controller
         $user = Auth::user();
         
         // Seul le rôle juridique peut changer le statut des garanties (selon les règles de gestion)
-        // Le rôle IT est également autorisé pour les besoins techniques
-        if (!$user->isJuridique() && !$user->isIt()) {
+        // Le rôle SuperAdmin est également autorisé pour les besoins techniques
+        if (!$user->isJuridique() && !$user->isSuperAdmin()) {
             return redirect()->back()
                 ->with('error', 'Vous n\'avez pas les permissions nécessaires. Seul le service juridique peut changer le statut des garanties.');
         }
 
         // Vérifier si cette transition nécessite spécifiquement le rôle juridique
         // Toutes les transitions sensibles (Contentieux, Réalisation, Mutation, Main levée, Vente) nécessitent le rôle juridique
-        if ($garantie->transitionRequiertJuridique($nouveauStatut) && !$user->isJuridique() && !$user->isIt()) {
+        if ($garantie->transitionRequiertJuridique($nouveauStatut) && !$user->isJuridique() && !$user->isSuperAdmin()) {
             return redirect()->back()
                 ->with('error', 'Cette transition nécessite le rôle juridique. Seul le service juridique peut effectuer cette opération.');
         }

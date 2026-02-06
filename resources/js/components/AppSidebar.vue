@@ -30,76 +30,8 @@ const mainNavItems = computed<NavItem[]>(() => {
         },
     ];
 
-    // IT (Admin) voit tout
-    if (auth.value?.isAdmin || auth.value?.isIt) {
-        items.push(
-            {
-                title: 'Utilisateurs',
-                icon: UserCog,
-                items: [
-                     {
-                        title: 'Créer un nouvel utilisateur',
-                        href: '/users/create',
-                    },
-                    {
-                        title: 'Liste des utilisateurs',
-                        href: '/users',
-                    },
-                   
-                ],
-            },
-            {
-                title: 'Garants',
-                icon: User,
-                items: [
-                    {
-                        title: 'Nouveau',
-                        href: '/garants/create',
-                    },
-                    {
-                        title: 'Historique',
-                        href: '/garants',
-                    },
-                ],
-            },
-            {
-                title: 'Garanties',
-                icon: Shield,
-                items: [
-                    {
-                        title: 'Nouveau',
-                        href: '/garanties/create',
-                    },
-                    {
-                        title: 'Historique',
-                        href: '/garanties',
-                    },
-                ],
-            },
-            {
-                title: 'Types de garanties',
-                href: '/types-garanties',
-                icon: Settings,
-            },
-            {
-                title: 'Contrats de prêts',
-                href: '/contrats-prets',
-                icon: FileText,
-            },
-            {
-                title: 'Clients',
-                href: '/clients',
-                icon: Users,
-            },
-            {
-                title: 'Liaison',
-                href: '/liaisons',
-                icon: Link2,
-            }
-        );
-    }
-    // Analyste Risque : peut créer et modifier
-    else if (auth.value?.isAnalysteRisque) {
+    // SuperAdmin et Admin voient les mêmes onglets (sauf Configuration réservé à SuperAdmin)
+    if (auth.value?.isSuperAdmin || auth.value?.isAdmin) {
         items.push(
             {
                 title: 'Garants',
@@ -130,11 +62,6 @@ const mainNavItems = computed<NavItem[]>(() => {
                 ],
             },
             {
-                title: 'Types de garanties',
-                href: '/types-garanties',
-                icon: Settings,
-            },
-            {
                 title: 'Contrats de prêts',
                 href: '/contrats-prets',
                 icon: FileText,
@@ -150,6 +77,47 @@ const mainNavItems = computed<NavItem[]>(() => {
                 icon: Link2,
             }
         );
+        
+        // Admin voit "Types de garanties" dans la liste principale (lecture seule)
+        if (auth.value?.isAdmin) {
+            items.push(
+                {
+                    title: 'Types de garanties',
+                    href: '/types-garanties',
+                    icon: Settings,
+                }
+            );
+        }
+        
+        // Seul SuperAdmin a accès à l'onglet Configuration
+        if (auth.value?.isSuperAdmin) {
+            items.push(
+                {
+                    title: 'Configuration',
+                    icon: Settings,
+                    separator: true,
+                    items: [
+                        {
+                            title: 'Utilisateurs',
+                            items: [
+                                {
+                                    title: 'Créer un nouvel utilisateur',
+                                    href: '/users/create',
+                                },
+                                {
+                                    title: 'Liste des utilisateurs',
+                                    href: '/users',
+                                },
+                            ],
+                        },
+                        {
+                            title: 'Types de garanties',
+                            href: '/types-garanties',
+                        },
+                    ],
+                }
+            );
+        }
     }
     // Chargé d'Affaires : lecture seule
     else if (auth.value?.isChargeAffaires) {
@@ -181,36 +149,18 @@ const mainNavItems = computed<NavItem[]>(() => {
             }
         );
     }
-    // Autres rôles (anciens rôles pour compatibilité)
-    else {
+    // Juridique : lecture seule + changement de statut
+    else if (auth.value?.isJuridique) {
         items.push(
             {
                 title: 'Garants',
                 icon: User,
-                items: [
-                    {
-                        title: 'Nouveau',
-                        href: '/garants/create',
-                    },
-                    {
-                        title: 'Historique',
-                        href: '/garants',
-                    },
-                ],
+                href: '/garants',
             },
             {
                 title: 'Garanties',
                 icon: Shield,
-                items: [
-                    {
-                        title: 'Nouveau',
-                        href: '/garanties/create',
-                    },
-                    {
-                        title: 'Historique',
-                        href: '/garanties',
-                    },
-                ],
+                href: '/garanties',
             },
             {
                 title: 'Types de garanties',
@@ -221,6 +171,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Contrats de prêts',
                 href: '/contrats-prets',
                 icon: FileText,
+            },
+            {
+                title: 'Liaison',
+                href: '/liaisons',
+                icon: Link2,
             }
         );
     }

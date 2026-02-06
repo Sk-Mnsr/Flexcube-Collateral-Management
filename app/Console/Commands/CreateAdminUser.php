@@ -22,14 +22,14 @@ class CreateAdminUser extends Command
      *
      * @var string
      */
-    protected $description = 'Crée un nouvel utilisateur administrateur IT';
+    protected $description = 'Crée un nouvel utilisateur SuperAdmin (IT)';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Création d\'un nouvel utilisateur administrateur IT');
+        $this->info('Création d\'un nouvel utilisateur SuperAdmin (IT)');
         $this->newLine();
 
         // Récupérer les paramètres ou demander interactivement
@@ -58,11 +58,11 @@ class CreateAdminUser extends Command
             return Command::FAILURE;
         }
 
-        // Vérifier que le rôle IT existe
-        $itRole = Role::where('slug', 'it')->first();
+        // Vérifier que le rôle SuperAdmin (IT) existe
+        $superAdminRole = Role::where('slug', 'it')->first();
 
-        if (!$itRole) {
-            $this->error('Le rôle IT n\'existe pas dans la base de données.');
+        if (!$superAdminRole) {
+            $this->error('Le rôle SuperAdmin n\'existe pas dans la base de données.');
             $this->info('Veuillez exécuter le seeder des rôles d\'abord : php artisan db:seed --class=RoleSeeder');
             return Command::FAILURE;
         }
@@ -75,14 +75,14 @@ class CreateAdminUser extends Command
                 'password' => Hash::make($password),
             ]);
 
-            // Assigner le rôle IT
-            $user->roles()->attach($itRole->id);
+            // Assigner le rôle SuperAdmin
+            $user->roles()->attach($superAdminRole->id);
 
             $this->newLine();
-            $this->info('✓ Utilisateur administrateur IT créé avec succès !');
+            $this->info('✓ Utilisateur SuperAdmin créé avec succès !');
             $this->info("  Nom: {$user->name}");
             $this->info("  Email: {$user->email}");
-            $this->info("  Rôle: IT (Admin)");
+            $this->info("  Rôle: SuperAdmin");
 
             return Command::SUCCESS;
         } catch (\Exception $e) {

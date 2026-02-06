@@ -145,19 +145,28 @@ class User extends AuthenticatableBase
     }
 
     /**
-     * Vérifie si l'utilisateur est IT (Admin)
+     * Vérifie si l'utilisateur est SuperAdmin (IT)
      */
-    public function isIt(): bool
+    public function isSuperAdmin(): bool
     {
-        return $this->hasRole('it') || $this->hasRole('admin');
+        return $this->hasRole('it');
     }
 
     /**
-     * Vérifie si l'utilisateur est Analyste Risque
+     * Vérifie si l'utilisateur est IT (alias pour compatibilité)
+     * @deprecated Utiliser isSuperAdmin() à la place
      */
-    public function isAnalysteRisque(): bool
+    public function isIt(): bool
     {
-        return $this->hasRole('analyste-risque');
+        return $this->isSuperAdmin();
+    }
+
+    /**
+     * Vérifie si l'utilisateur est Admin (Admin crédit)
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
     }
 
     /**
@@ -174,14 +183,6 @@ class User extends AuthenticatableBase
     public function isJuridique(): bool
     {
         return $this->hasRole('juridique');
-    }
-
-    /**
-     * Vérifie si l'utilisateur est admin (ancien rôle, gardé pour compatibilité)
-     */
-    public function isAdmin(): bool
-    {
-        return $this->hasRole('admin') || $this->hasRole('it');
     }
 
     /**

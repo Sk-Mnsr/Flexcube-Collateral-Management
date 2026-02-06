@@ -69,8 +69,8 @@ const mainNavItems = computed<NavItem[]>(() => {
         },
     ];
 
-    // Admin voit tout
-    if (auth.value?.isAdmin || auth.value?.isIt) {
+    // SuperAdmin et Admin voient les utilisateurs
+    if (auth.value?.isSuperAdmin || auth.value?.isAdmin) {
         items.push(
             {
                 title: 'Utilisateurs',
