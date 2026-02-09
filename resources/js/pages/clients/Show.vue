@@ -27,7 +27,6 @@ interface Props {
         statut: string;
         created_at: string;
     }>;
-    };
 }
 
 const props = defineProps<Props>();
